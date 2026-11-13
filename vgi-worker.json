@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "catalog": "buoys",
+  "worker": [
+    "bin/vgi-buoys-worker"
+  ],
+  "checks": [
+    {
+      "name": "stations capability and XML",
+      "sql": "SELECT station_id, name, CAST(has_met AS INTEGER), CAST(has_currents AS INTEGER) FROM buoys.main.stations() ORDER BY station_id",
+      "rows": [
+        [
+          "41001",
+          "East Hatteras",
+          1,
+          null
+        ],
+        [
+          "44013",
+          "Boston & Harbor",
+          1,
+          0
+        ],
+        [
+          "tplm2",
+          "Thomas Point",
+          1,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "latest normalizes IDs preserves missing",
+      "sql": "SELECT station_id, CAST(wind_speed_mps AS INTEGER), CAST(wave_height_m*10 AS INTEGER) FROM buoys.main.latest_observations() ORDER BY station_id",
+      "rows": [
+        [
+          "44013",
+          5,
+          15
+        ],
+        [
+          "tplm2",
+          0,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "station latest filter",
+      "sql": "SELECT station_id FROM buoys.main.latest_observations(station_id := 'TPLM2')",
+      "rows": [
+        [
+          "tplm2"
+        ]
+      ]
+    },
+    {
+      "name": "observation UTC and units",
+      "sql": "SELECT strftime(time,'%Y-%m-%d %H:%M:%S'), CAST(visibility_m AS INTEGER), CAST(round(water_level_m*10000) AS INTEGER), CAST(dominant_period_s AS INTEGER) FROM buoys.main.observations('44013') ORDER BY time DESC LIMIT 1",
+      "rows": [
+        [
+          "2026-01-02 00:00:00",
+          3704,
+          9144,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "inclusive time filters",
+      "sql": "SELECT count(*),count(wave_height_m),CAST(sum(wave_height_m) AS INTEGER) FROM buoys.main.observations('44013', start_time := '2026-01-01T00:10:00Z', end_time := '2026-01-01T00:20:00Z')",
+      "rows": [
+        [
+          2,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "large Arrow batch",
+      "sql": "SELECT count(*),count(DISTINCT time), CAST(sum(wave_height_m)*10 AS BIGINT) FROM buoys.main.observations('large')",
+      "rows": [
+        [
+          5001,
+          5001,
+          75015
+        ]
+      ]
+    },
+    {
+      "name": "drifting layout",
+      "sql": "SELECT CAST(latitude*100 AS INTEGER), CAST(longitude*100 AS INTEGER), strftime(time,'%H:%M'), CAST(wave_height_m*10 AS INTEGER) FROM buoys.main.observations('drift')",
+      "rows": [
+        [
+          2599,
+          -8966,
+          "00:30",
+          12
+        ]
+      ]
+    },
+    {
+      "name": "empty history",
+      "sql": "SELECT count(*) FROM buoys.main.observations('empty')",
+      "rows": [
+        [
+          0
+        ]
+      ]
+    },
+    {
+      "name": "empty filtered latest",
+      "sql": "SELECT count(*) FROM buoys.main.latest_observations(station_id := 'absent')",
+      "rows": [
+        [
+          0
+        ]
+      ]
+    },
+    {
+      "name": "join metadata and observation",
+      "sql": "SELECT s.name, CAST(o.wind_speed_mps AS INTEGER) FROM buoys.main.stations() s JOIN buoys.main.latest_observations() o USING(station_id) ORDER BY s.name",
+      "rows": [
+        [
+          "Boston & Harbor",
+          5
+        ],
+        [
+          "Thomas Point",
+          0
+        ]
+      ]
+    },
+    {
+      "name": "timestamp and provenance",
+      "sql": "SELECT CAST(bool_and(fetched_at IS NOT NULL AND source_url LIKE '%44013.txt') AS INTEGER), typeof(min(time)) FROM buoys.main.observations('44013')",
+      "rows": [
+        [
+          1,
+          "TIMESTAMP WITH TIME ZONE"
+        ]
+      ]
+    },
+    {
+      "name": "offline reference table",
+      "sql": "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'",
+      "rows": [
+        [
+          "visibility_m",
+          "nmi",
+          "m",
+          1852
+        ]
+      ]
+    }
+  ]
+}

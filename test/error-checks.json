@@ -1,0 +1,26 @@
+[
+  {
+    "sql": "SELECT * FROM buoys.main.observations(NULL)",
+    "error": ".*"
+  },
+  {
+    "sql": "SELECT * FROM buoys.main.latest_observations(station_id := NULL)",
+    "error": ".*"
+  },
+  {
+    "sql": "SELECT * FROM buoys.main.observations('../abc')",
+    "error": ".*"
+  },
+  {
+    "sql": "SELECT * FROM buoys.main.observations('absent')",
+    "error": "HTTP 404"
+  },
+  {
+    "sql": "SELECT * FROM buoys.main.observations('44013', start_time := '2026-01-01T00:00:00')",
+    "error": "UTC ISO"
+  },
+  {
+    "sql": "SELECT * FROM buoys.main.observations('44013', start_time := '2026-01-02T00:00:00Z', end_time := '2026-01-01T00:00:00Z')",
+    "error": "end_time"
+  }
+]

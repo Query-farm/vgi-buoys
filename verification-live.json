@@ -1,0 +1,40 @@
+{
+  "engine": "stock DuckDB",
+  "engine_version": "2.0.0",
+  "catalog": "buoys",
+  "mode": "live NOAA",
+  "attach_sql": "ATTACH 'buoys' (TYPE vgi, LOCATION './bin/vgi-buoys-worker')",
+  "verified_at": "2026-11-13T14:58:02.160483+00:00",
+  "checks": [
+    {
+      "name": "live station directory",
+      "passed": true,
+      "rows": [
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "name": "live latest observations",
+      "passed": true,
+      "rows": [
+        [
+          1
+        ]
+      ]
+    },
+    {
+      "name": "live Boston station history",
+      "passed": true,
+      "rows": [
+        [
+          1
+        ]
+      ]
+    }
+  ],
+  "extension_version": "e75482339d",
+  "expected_error_checks": 0,
+  "path_note": "Local executable path normalized to ./bin/ for publication; run from the project directory."
+}

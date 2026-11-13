@@ -1,0 +1,29 @@
+[
+  {
+    "name": "live station directory",
+    "sql": "SELECT CAST(count(*)>100 AS INTEGER) FROM buoys.main.stations",
+    "rows": [
+      [
+        1
+      ]
+    ]
+  },
+  {
+    "name": "live latest observations",
+    "sql": "SELECT CAST(count(*)>100 AND count(time)=count(*) AS INTEGER) FROM buoys.main.latest_observations()",
+    "rows": [
+      [
+        1
+      ]
+    ]
+  },
+  {
+    "name": "live Boston station history",
+    "sql": "SELECT CAST(count(*)>100 AND count(time)=count(*) AND count(wave_height_m)>0 AS INTEGER) FROM buoys.main.observations('44013')",
+    "rows": [
+      [
+        1
+      ]
+    ]
+  }
+]

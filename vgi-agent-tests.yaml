@@ -1,16 +1,9 @@
-# Private graders for the public vgi.agent_test_tasks in the worker's catalog metadata.
-# `vgi-lint lint --ai` runs an agent on each prompt and grades it with check_sql.
-# See https://github.com/Query-farm/vgi-lint-check (VGI920).
 tasks:
-  - name: formal_greeting
-    reference_sql: SELECT starter.main.greet('Grace', 'formal') AS greeting
-  - name: sum_of_squares
-    reference_sql: SELECT sum(squared) AS total FROM starter.main.sequence_table(10)
-  - name: stepped_sequence
-    reference_sql: SELECT n FROM starter.main.sequence_table(4, step := 5) ORDER BY n
-  # Reads the public demo API (https://vgi-starter-api.query-farm.services/v1).
-  - name: items_per_category
-    check_sql: >-
-      SELECT count(*) = 3 AND sum(items) = 25
-      FROM (SELECT category, count(*) AS items
-            FROM starter.main.fetch_items('https://vgi-starter-api.query-farm.services/v1') GROUP BY category)
+  - name: stations_query
+    reference_sql: "SELECT station_id, name FROM buoys.main.stations() ORDER BY station_id LIMIT 5"
+  - name: latest_observations_query
+    reference_sql: "SELECT station_id, wind_speed_mps FROM buoys.main.latest_observations() WHERE wind_speed_mps IS NOT NULL ORDER BY wind_speed_mps DESC, station_id LIMIT 5"
+  - name: observations_query
+    reference_sql: "SELECT time, wave_height_m FROM buoys.main.observations('44013') WHERE wave_height_m IS NOT NULL ORDER BY time DESC LIMIT 5"
+  - name: reference_units
+    reference_sql: "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'"

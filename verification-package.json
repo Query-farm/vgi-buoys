@@ -1,0 +1,163 @@
+{
+  "engine": "stock DuckDB",
+  "engine_version": "2.0.0",
+  "catalog": "buoys",
+  "mode": "offline fixtures",
+  "attach_sql": "ATTACH 'buoys' (TYPE vgi, LOCATION './vgi-buoys-worker')",
+  "verified_at": "2026-11-13T15:08:39.488020+00:00",
+  "checks": [
+    {
+      "name": "stations capability and XML",
+      "passed": true,
+      "rows": [
+        [
+          "41001",
+          "East Hatteras",
+          1,
+          null
+        ],
+        [
+          "44013",
+          "Boston & Harbor",
+          1,
+          0
+        ],
+        [
+          "tplm2",
+          "Thomas Point",
+          1,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "latest normalizes IDs preserves missing",
+      "passed": true,
+      "rows": [
+        [
+          "44013",
+          5,
+          15
+        ],
+        [
+          "tplm2",
+          0,
+          null
+        ]
+      ]
+    },
+    {
+      "name": "station latest filter",
+      "passed": true,
+      "rows": [
+        [
+          "tplm2"
+        ]
+      ]
+    },
+    {
+      "name": "observation UTC and units",
+      "passed": true,
+      "rows": [
+        [
+          "2026-01-02 00:00:00",
+          3704,
+          9144,
+          8
+        ]
+      ]
+    },
+    {
+      "name": "inclusive time filters",
+      "passed": true,
+      "rows": [
+        [
+          2,
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "large Arrow batch",
+      "passed": true,
+      "rows": [
+        [
+          5001,
+          5001,
+          75015
+        ]
+      ]
+    },
+    {
+      "name": "drifting layout",
+      "passed": true,
+      "rows": [
+        [
+          2599,
+          -8966,
+          "00:30",
+          12
+        ]
+      ]
+    },
+    {
+      "name": "empty history",
+      "passed": true,
+      "rows": [
+        [
+          0
+        ]
+      ]
+    },
+    {
+      "name": "empty filtered latest",
+      "passed": true,
+      "rows": [
+        [
+          0
+        ]
+      ]
+    },
+    {
+      "name": "join metadata and observation",
+      "passed": true,
+      "rows": [
+        [
+          "Boston & Harbor",
+          5
+        ],
+        [
+          "Thomas Point",
+          0
+        ]
+      ]
+    },
+    {
+      "name": "timestamp and provenance",
+      "passed": true,
+      "rows": [
+        [
+          1,
+          "TIMESTAMP WITH TIME ZONE"
+        ]
+      ]
+    },
+    {
+      "name": "offline reference table",
+      "passed": true,
+      "rows": [
+        [
+          "visibility_m",
+          "nmi",
+          "m",
+          1852.0
+        ]
+      ]
+    }
+  ],
+  "extension_version": "e75482339d",
+  "expected_error_checks": 6,
+  "artifact": "macOS ARM64 standalone binary extracted into a temporary directory, outside the source tree",
+  "path_note": "Temporary extraction path normalized for publication."
+}

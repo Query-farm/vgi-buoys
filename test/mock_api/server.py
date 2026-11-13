@@ -1,127 +1,43 @@
 #!/usr/bin/env python3
-# managed-by: vgi-starters (edit upstream in shared/, then run tools/render.py)
-"""A tiny, dependency-free paginated JSON API used by the tests.
-
-``fetch_items`` (the example REST table function) is tested against this
-server, so the suite stays deterministic and runs offline.
-
-Endpoints
----------
-``GET /items?page=<n>&page_size=<m>``
-    Returns ``{"items": [...], "next_page": <n+1 or null>}`` over a fixed set
-    of 25 items.
-``GET /health``
-    Returns ``{"status": "ok"}``.
-
-Behaviour switches
-------------------
-* ``MOCK_API_TOKEN`` env var: if set, every ``/items`` request must send
-  ``Authorization: Bearer <token>`` or it gets a 401.
-* ``MOCK_API_FLAKY=1`` env var (or ``?flaky=1``): the first request for each
-  page returns ``429`` with ``Retry-After: 0``, exercising the client's retry
-  path.
-
-Usage::
-
-    python3 test/mock_api/server.py            # prints PORT:<n> once listening
-    python3 test/mock_api/server.py --port 8765
-"""
-
-from __future__ import annotations
-
-import argparse
-import contextlib
+"""Deterministic NOAA-shaped responses for tests; never contacts the network."""
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlparse, parse_qs
+from datetime import datetime, timedelta
 import json
 import os
-import sys
-import threading
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, urlparse
-
-CATEGORIES = ("hardware", "software", "service")
-
-ITEMS = [
-    {
-        "id": i,
-        "name": f"item-{i:02d}",
-        "category": CATEGORIES[i % 3],
-        "price": round(1.5 * i, 2),
-    }
-    for i in range(1, 26)
-]
-
-_flaky_seen: set[tuple[int, int]] = set()
-_flaky_lock = threading.Lock()
-
 
 class Handler(BaseHTTPRequestHandler):
-    """Serve ``/items`` pages and ``/health``."""
-
-    def log_message(self, format: str, *args: object) -> None:  # noqa: A002 - stdlib signature
-        """Log to stderr only, so stdout carries nothing except the ``PORT:`` line."""
-        sys.stderr.write("mock_api: " + (format % args) + "\n")
-
-    def _send(self, status: int, body: object, headers: dict[str, str] | None = None) -> None:
-        payload = json.dumps(body).encode()
+    seen = set()
+    def log_message(self, *_): pass
+    def send(self, value, status=200, content_type="application/json", headers=None):
+        body=(json.dumps(value) if content_type == "application/json" else value).encode()
         self.send_response(status)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(payload)))
-        for key, value in (headers or {}).items():
-            self.send_header(key, value)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        for k,v in (headers or {}).items(): self.send_header(k,v)
         self.end_headers()
-        self.wfile.write(payload)
-
-    def do_GET(self) -> None:
-        """Handle GET requests."""
-        url = urlparse(self.path)
-        if url.path == "/health":
-            self._send(200, {"status": "ok"})
-            return
-        if url.path != "/items":
-            self._send(404, {"error": "not found"})
-            return
-
-        token = os.environ.get("MOCK_API_TOKEN")
-        if token and self.headers.get("Authorization") != f"Bearer {token}":
-            self._send(401, {"error": "missing or invalid bearer token"})
-            return
-
-        query = parse_qs(url.query)
+        self.wfile.write(body)
+    def do_GET(self):
+        url=urlparse(self.path)
+        q={k:v[0] for k,v in parse_qs(url.query).items()}
+        if os.environ.get("MOCK_API_FLAKY") and self.path not in self.seen:
+            self.seen.add(self.path)
+            return self.send({"error":"rate limited"},429,headers={"Retry-After":"0"})
         try:
-            page = int(query.get("page", ["1"])[0])
-            page_size = int(query.get("page_size", ["10"])[0])
-        except ValueError:
-            self._send(400, {"error": "page and page_size must be integers"})
-            return
-        if page < 1 or not 1 <= page_size <= 1000:
-            self._send(400, {"error": "page must be >= 1 and page_size in [1, 1000]"})
-            return
-
-        if os.environ.get("MOCK_API_FLAKY") == "1" or query.get("flaky", ["0"])[0] == "1":
-            with _flaky_lock:
-                key = (page, page_size)
-                if key not in _flaky_seen:
-                    _flaky_seen.add(key)
-                    self._send(429, {"error": "slow down"}, {"Retry-After": "0"})
-                    return
-
-        start = (page - 1) * page_size
-        chunk = ITEMS[start : start + page_size]
-        next_page = page + 1 if start + page_size < len(ITEMS) else None
-        self._send(200, {"items": chunk, "next_page": next_page})
-
-
-def main() -> None:
-    """Start the server and print ``PORT:<n>`` once it is listening."""
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=0)
-    args = parser.parse_args()
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
-    print(f"PORT:{server.server_address[1]}", flush=True)
-    with contextlib.suppress(KeyboardInterrupt):
-        server.serve_forever()
-
+            self.route(url.path,q)
+        except (ValueError, KeyError, AssertionError) as error:
+            self.send({"error":{"message":str(error)}},400)
+    def route(self, path, q):
+        fixtures=__import__("pathlib").Path(__file__).with_name("fixtures")
+        files={"/activestations.xml":"stations.xml","/data/latest_obs/latest_obs.txt":"latest.txt","/data/realtime2/44013.txt":"history.txt","/data/realtime2/drift.txt":"drifting.txt","/data/realtime2/empty.txt":"empty.txt"}
+        if path in files:return self.send((fixtures/files[path]).read_text(),content_type="application/xml" if path.endswith("xml") else "text/plain")
+        if path=="/data/realtime2/large.txt":
+            header=(fixtures/"history.txt").read_text().splitlines()[:2]
+            rows=[(datetime(2026,1,1)+timedelta(minutes=i*10)).strftime("%Y %m %d %H %M")+" 90 5 7 1.5 8 6 180 1013 10 12 8 2 +1 3" for i in range(5001)]
+            return self.send("\n".join(header+rows)+"\n",content_type="text/plain")
+        return self.send({},404)
 
 if __name__ == "__main__":
-    main()
+    server=ThreadingHTTPServer(("127.0.0.1", int(os.environ.get("MOCK_API_PORT","0"))),Handler)
+    print(f"PORT:{server.server_address[1]}",flush=True)
+    server.serve_forever()
