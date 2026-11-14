@@ -1,0 +1,23 @@
+{
+  "source": "NOAA National Data Buoy Center",
+  "records": {
+    "/activestations.xml": {
+      "url": "https://www.ndbc.noaa.gov/activestations.xml",
+      "path": "/activestations.xml",
+      "file": "activestations.xml",
+      "content_type": "text/xml",
+      "retrieved_at_utc": "2026-11-14T23:21:06.753870+00:00",
+      "sha256": "e4dc62665fa4015545a2cd8b580e409de28b7a5d78ca887396cbba4ddeb66bc1",
+      "bytes": 273696
+    },
+    "/data/latest_obs/latest_obs.txt": {
+      "url": "https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt",
+      "path": "/data/latest_obs/latest_obs.txt",
+      "file": "latest_obs.txt",
+      "content_type": "text/plain; charset=ISO-8859-1",
+      "retrieved_at_utc": "2026-11-14T23:21:06.897058+00:00",
+      "sha256": "51c35fb36dd2f93fbe5df2da503a88138390b18b270cd3a070c88441b0e81744",
+      "bytes": 99484
+    }
+  }
+}
