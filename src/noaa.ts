@@ -1,5 +1,6 @@
 import { constraintRecord, type TableDescriptor, utf8, type VgiFunction } from "@query-farm/vgi";
 import { XMLParser, XMLValidator } from "fast-xml-parser";
+import { DAILY_HISTORY_WITH_STATION, LARGEST_SEAS_NAMED, SILENT_MET_STATIONS } from "./composed.ts";
 import { endpoint, getText } from "./http.ts";
 import {
   type Column,
@@ -248,6 +249,7 @@ const stations = oneShot<Record<string, never>>({
       sql: "SELECT station_id, name, latitude, longitude FROM buoys.main.stations() WHERE has_met ORDER BY station_id LIMIT 20",
       description: "Discover stations with meteorological data",
     },
+    SILENT_MET_STATIONS,
   ],
 });
 
@@ -282,6 +284,7 @@ const latest = oneShot<{ station_id: string }>({
       sql: "SELECT station_id, time, wave_height_m, dominant_period_s FROM buoys.main.latest_observations() WHERE wave_height_m IS NOT NULL ORDER BY wave_height_m DESC, station_id LIMIT 10",
       description: "Find the largest reported seas and their wave periods",
     },
+    LARGEST_SEAS_NAMED,
   ],
 });
 
@@ -343,6 +346,7 @@ const observations = oneShot<{ station_id: string; start_time: string; end_time:
       sql: "SELECT time, wind_speed_mps, wave_height_m, dominant_period_s FROM buoys.main.observations('44013') WHERE wave_height_m IS NOT NULL ORDER BY time DESC LIMIT 24",
       description: "Inspect the latest measured waves and winds off Boston",
     },
+    DAILY_HISTORY_WITH_STATION,
   ],
 });
 
@@ -383,6 +387,7 @@ export const stationsTable: TableDescriptor = {
         sql: "SELECT station_id, name FROM buoys.main.stations WHERE has_met ORDER BY station_id",
         description: "Discover stations with meteorological data",
       },
+      SILENT_MET_STATIONS,
     ]),
   },
 };

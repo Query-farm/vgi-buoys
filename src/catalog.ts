@@ -2,15 +2,11 @@ import { referenceTable } from "./reference.ts";
 /** Assemble NOAA readers and reference tables into the public catalog. */
 
 import type { CatalogDescriptor, VgiFunction } from "@query-farm/vgi";
+import { type Example, LATEST_WITH_UNITS } from "./composed.ts";
 import { CATALOG_DOC_MD, CATALOG_NAME, CATALOG_TAGS, SCHEMA_DOC_MD, SCHEMA_TAGS, SOURCE_URL } from "./meta.ts";
 import { FUNCTIONS, stationsTable } from "./noaa.ts";
 
 export { FUNCTIONS } from "./noaa.ts";
-
-interface Example {
-  description: string;
-  sql: string;
-}
 
 /**
  * Publish each function's examples as `vgi.example_queries` (with descriptions).
@@ -33,7 +29,8 @@ function stampExampleQueries(functions: VgiFunction[]): Example[] {
   return [...byName.values()].flat();
 }
 
-const ALL_EXAMPLES = stampExampleQueries(FUNCTIONS);
+// The measurements table's scan is not in FUNCTIONS, so its composed example is added here.
+const ALL_EXAMPLES = [...stampExampleQueries(FUNCTIONS), LATEST_WITH_UNITS];
 
 export const CATALOG: CatalogDescriptor = {
   name: CATALOG_NAME,

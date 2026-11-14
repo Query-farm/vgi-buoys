@@ -45,6 +45,15 @@ FROM buoys.main.stations s
 JOIN buoys.main.latest_observations() o USING (station_id)
 WHERE s.latitude BETWEEN 40 AND 44 AND s.longitude BETWEEN -74 AND -68
 ORDER BY s.name;
+
+-- One row per reported measurement in a station's latest report, with units
+-- and source fields from the measurements reference table.
+SELECT v.column_name, v.value, m.output_unit, m.source_field, m.source_unit, m.scale
+FROM (UNPIVOT buoys.main.latest_observations(station_id := '46026')
+      ON COLUMNS(* EXCLUDE (station_id, time, latitude, longitude, source_url, fetched_at))
+      INTO NAME column_name VALUE value) AS v
+JOIN buoys.main.measurements AS m USING (column_name)
+ORDER BY v.column_name;
 ```
 
 Run [demo.sql](demo.sql) from the project directory after `make build`; it uses the local `bin/` launcher.

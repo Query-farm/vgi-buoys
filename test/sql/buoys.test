@@ -120,3 +120,40 @@ query TTTI
 SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m';
 ----
 visibility_m	nmi	m	1852
+
+# composed: largest seas named from the station directory (src/composed.ts LARGEST_SEAS_NAMED)
+query TTTTTRR
+SELECT o.station_id, s.name, s.owner, s.station_type, o.time, o.wave_height_m, o.dominant_period_s FROM buoys.main.latest_observations() AS o JOIN buoys.main.stations AS s USING (station_id) WHERE o.wave_height_m IS NOT NULL ORDER BY o.wave_height_m DESC, o.station_id LIMIT 10;
+----
+44013	Boston & Harbor	NDBC	buoy	2026-01-02 00:00:00+00	1.5	8.0
+
+# composed: has_met stations missing from the latest file (SILENT_MET_STATIONS)
+query TTTT
+SELECT s.station_id, s.name, s.owner, s.station_type FROM buoys.main.stations AS s ANTI JOIN buoys.main.latest_observations() AS o USING (station_id) WHERE s.has_met ORDER BY s.station_id;
+----
+41001	East Hatteras	NDBC	buoy
+
+# composed: daily history with directory name and coordinates (DAILY_HISTORY_WITH_STATION)
+query TTRRTRRI
+SELECT s.station_id, s.name, s.latitude, s.longitude, date_trunc('day', o.time) AS obs_day, max(o.wave_height_m) AS max_wave_height_m, avg(o.wind_speed_mps) AS mean_wind_speed_mps, count(*) AS reports FROM buoys.main.observations('44013') AS o JOIN buoys.main.stations AS s USING (station_id) GROUP BY ALL ORDER BY obs_day DESC LIMIT 7;
+----
+44013	Boston & Harbor	42.346	-70.651	2026-01-02 00:00:00+00	1.5	5.0	1
+44013	Boston & Harbor	42.346	-70.651	2026-01-01 00:00:00+00	1.0	2.0	3
+
+# composed: latest report unpivoted and joined to units (LATEST_WITH_UNITS); 46026 is absent from the fixture
+query I
+SELECT count(*) FROM (SELECT v.column_name, v.value, m.output_unit, m.source_field, m.source_unit, m.scale FROM (UNPIVOT buoys.main.latest_observations(station_id := '46026') ON COLUMNS(* EXCLUDE (station_id, time, latitude, longitude, source_url, fetched_at)) INTO NAME column_name VALUE value) AS v JOIN buoys.main.measurements AS m USING (column_name) ORDER BY v.column_name);
+----
+0
+
+# same shape on the fixture station: NULL measurements drop out, units and scales come from measurements
+query TRTTTR
+SELECT v.column_name, v.value, m.output_unit, m.source_field, m.source_unit, m.scale FROM (UNPIVOT buoys.main.latest_observations(station_id := 'tplm2') ON COLUMNS(* EXCLUDE (station_id, time, latitude, longitude, source_url, fetched_at)) INTO NAME column_name VALUE value) AS v JOIN buoys.main.measurements AS m USING (column_name) ORDER BY v.column_name;
+----
+air_temperature_c	-2.0	degC	ATMP	degC	1.0
+dew_point_c	-3.0	degC	DEWP	degC	1.0
+pressure_hpa	1011.0	hPa	PRES	hPa	1.0
+pressure_tendency_hpa	-1.0	hPa	PTDY	hPa	1.0
+water_temperature_c	5.0	degC	WTMP	degC	1.0
+wind_gust_mps	0.0	m/s	GST	m/s	1.0
+wind_speed_mps	0.0	m/s	WSPD	m/s	1.0

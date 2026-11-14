@@ -1,4 +1,5 @@
 import { constraintRecord, type TableDescriptor } from "@query-farm/vgi";
+import { LATEST_WITH_UNITS } from "./composed.ts";
 import { MEASURES } from "./noaa.ts";
 import { type Column, oneShot, outputSchema } from "./table.ts";
 
@@ -36,6 +37,7 @@ const scan = oneShot<Record<string, never>>({
       sql: "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'",
       description: "NDBC measurement fields, source units and conversion factors",
     },
+    LATEST_WITH_UNITS,
   ],
 });
 export const referenceTable: TableDescriptor = {
@@ -81,6 +83,7 @@ export const referenceTable: TableDescriptor = {
         sql: "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'",
         description: "NDBC measurement fields, source units and conversion factors",
       },
+      LATEST_WITH_UNITS,
     ]),
   },
 };

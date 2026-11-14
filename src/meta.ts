@@ -90,6 +90,18 @@ export const AGENT_TEST_TASKS = [
     prompt:
       "Using buoys.main.observations, list the five most recent nonmissing wave heights for station 44013, showing time and wave_height_m.",
   },
+  {
+    name: "composed_boston_peak_wave",
+    prompt:
+      "What is the highest significant wave height in buoy 44013's whole recent history (buoys.main.observations), and what is that station's name in the station directory? " +
+      "Save the answer with CREATE TEMP TABLE boston_peak AS SELECT ... with exactly one row and columns name (VARCHAR) and max_wave_height_m (DOUBLE).",
+  },
+  {
+    name: "composed_max_visibility_nmi",
+    prompt:
+      "What is the greatest visibility currently reported in buoys.main.latest_observations, expressed back in the NDBC source unit? Use the measurements reference table's scale for visibility_m to convert. " +
+      "Save the answer with CREATE TEMP TABLE max_visibility AS SELECT ... with exactly one row and one column visibility_nmi (DOUBLE).",
+  },
 ];
 export const CATALOG_TAGS: Record<string, string> = {
   ...{

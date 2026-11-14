@@ -7,3 +7,7 @@ tasks:
     reference_sql: "SELECT time, wave_height_m FROM buoys.main.observations('44013') WHERE wave_height_m IS NOT NULL ORDER BY time DESC LIMIT 5"
   - name: reference_units
     reference_sql: "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'"
+  - name: composed_boston_peak_wave
+    check_sql: "SELECT count(*) = 1 AND coalesce(bool_and(a.name = r.name AND abs(a.max_wave_height_m - r.max_wave_height_m) < 0.001), false) FROM boston_peak a, (SELECT s.name, max(o.wave_height_m) AS max_wave_height_m FROM buoys.main.observations('44013') o JOIN buoys.main.stations s USING (station_id) GROUP BY s.name) r"
+  - name: composed_max_visibility_nmi
+    check_sql: "SELECT count(*) = 1 AND coalesce(bool_and(abs(a.visibility_nmi - r.v) < 0.01), false) FROM max_visibility a, (SELECT max(o.visibility_m / m.scale) AS v FROM buoys.main.latest_observations() o JOIN buoys.main.measurements m ON m.column_name = 'visibility_m') r"
