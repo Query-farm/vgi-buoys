@@ -145,3 +145,7 @@ Report issues with the query, worker version and NOAA source URL. Do not include
 ## License
 
 [BSD Zero Clause](LICENSE), inherited from the Query Farm starter.
+
+## Executable notebooks
+
+[Count measured waves before counting exceedances](notebooks/README.md) uses the published worker, recorded NOAA responses, visible SQL and a threshold experiment.
