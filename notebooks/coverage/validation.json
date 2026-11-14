@@ -1,0 +1,336 @@
+{
+  "schema_version": 1,
+  "status": "met",
+  "meets_target": true,
+  "catalogs": {
+    "released": {
+      "catalog_status": "verified",
+      "revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+      "catalog_sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+      "collection_reconciled": true,
+      "denominator": 4,
+      "observed_objects": 4,
+      "required": 4,
+      "verified_count": 4,
+      "candidate_count": 0,
+      "fraction": 1.0,
+      "meets_target": true,
+      "exact_runtime_count": 4,
+      "runtime_revisions": [
+        "6d34f79eeb80d31bdb188666f60d116204625bb8"
+      ],
+      "covered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "latest_observations"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "measurements"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "observations"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "stations"
+        }
+      ],
+      "uncovered": [],
+      "objects": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "latest_observations",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "latest_observations(VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "measurements",
+          "kinds": [
+            "table"
+          ],
+          "signatures": [
+            "TABLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "observations",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "observations(VARCHAR, VARCHAR, VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "stations",
+          "kinds": [
+            "function",
+            "table"
+          ],
+          "signatures": [
+            "TABLE",
+            "stations() -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        }
+      ],
+      "issues": []
+    },
+    "current": {
+      "catalog_status": "verified",
+      "revision": "3d6abf92b1e75f3e9efc1639c5f203a845526590",
+      "catalog_sha256": "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20",
+      "collection_reconciled": false,
+      "denominator": 4,
+      "observed_objects": 4,
+      "required": 4,
+      "verified_count": 4,
+      "candidate_count": 0,
+      "fraction": 1.0,
+      "meets_target": true,
+      "exact_runtime_count": 0,
+      "runtime_revisions": [
+        "6d34f79eeb80d31bdb188666f60d116204625bb8"
+      ],
+      "covered": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "latest_observations"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "measurements"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "observations"
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "stations"
+        }
+      ],
+      "uncovered": [],
+      "objects": [
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "latest_observations",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "latest_observations(VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "measurements",
+          "kinds": [
+            "table"
+          ],
+          "signatures": [
+            "TABLE"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "observations",
+          "kinds": [
+            "function"
+          ],
+          "signatures": [
+            "observations(VARCHAR, VARCHAR, VARCHAR) -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        },
+        {
+          "schema": [
+            "main"
+          ],
+          "name": "stations",
+          "kinds": [
+            "function",
+            "table"
+          ],
+          "signatures": [
+            "TABLE",
+            "stations() -> None"
+          ],
+          "access": [
+            "read"
+          ],
+          "authentication": [
+            "none"
+          ]
+        }
+      ],
+      "issues": []
+    }
+  },
+  "interface_drift": {
+    "known": true,
+    "current_only": [],
+    "released_only": [],
+    "changed": []
+  },
+  "notebooks": {
+    "01_measure_wave_exceedance.ipynb": {
+      "verified": true,
+      "issues": []
+    },
+    "02_latest_is_not_a_fresh_wave_measurement.ipynb": {
+      "verified": true,
+      "issues": []
+    }
+  },
+  "examples": [
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "measurements"
+      },
+      "notebook": "01_measure_wave_exceedance.ipynb",
+      "runtime_revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+      "runtime_catalog_sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "stations"
+      },
+      "notebook": "01_measure_wave_exceedance.ipynb",
+      "runtime_revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+      "runtime_catalog_sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "observations"
+      },
+      "notebook": "01_measure_wave_exceedance.ipynb",
+      "runtime_revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+      "runtime_catalog_sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf"
+    },
+    {
+      "status": "verified",
+      "issues": [],
+      "verified_catalogs": [
+        "released",
+        "current"
+      ],
+      "object": {
+        "schema": [
+          "main"
+        ],
+        "name": "latest_observations"
+      },
+      "notebook": "02_latest_is_not_a_fresh_wave_measurement.ipynb",
+      "runtime_revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+      "runtime_catalog_sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf"
+    }
+  ],
+  "issues": []
+}

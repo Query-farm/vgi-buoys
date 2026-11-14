@@ -1,114 +1,43 @@
-# NOAA buoy notebooks
+# NOAA Buoys notebooks
 
-[01 · Count measured waves before counting exceedances](01_measure_wave_exceedance.ipynb)
-asks how missing wave measurements affect a threshold summary at Boston station
-**44013**. Visible SQL retrieves station metadata and observations through the real
-worker, audits coverage, and compares two explicitly different denominators.
-Two figures show the observations and the resulting proportions.
+Two executed SQL stories use the public [v0.1.0 worker release](https://github.com/Query-farm/vgi-buoys/releases/tag/v0.1.0), original NOAA recordings and readable SVG charts. Each has an **Open in Colab** button and a standalone bootstrap that fetches verified companions. The full [standard and runner](https://github.com/Query-farm/vgi-example-notebooks) are shared.
 
-## Run independently
+| Notebook | Question | Experiment |
+|---|---|---|
+| [Count measured waves before counting exceedances](01_measure_wave_exceedance.ipynb) | How does including missing wave measurements change the denominator? A fixed 48-hour Boston 44013 window. | Wave threshold 2→3 metres |
+| [Latest is not a fresh wave measurement](02_latest_is_not_a_fresh_wave_measurement.ipynb) | Which latest-file station reports satisfy both an age policy and wave availability? | Maximum age 30→120 minutes |
 
-Install [uv](https://docs.astral.sh/uv/). Copy this directory anywhere, then run:
+### Run
+
+Install uv, then run from this directory. Colab uses the shared base package; the runner extra belongs only in this local publication environment.
 
 ```sh
 uv sync --locked
-uv run --locked python execute.py --timeout 300
+uv run --locked vgi-notebooks --timeout 300
+uv run --locked vgi-notebooks 01_measure_wave_exceedance.ipynb --parameters '{"WAVE_THRESHOLD_M":3.0}' --output-dir artifacts/threshold-3m
+uv run --locked vgi-notebooks 02_latest_is_not_a_fresh_wave_measurement.ipynb --parameters '{"MAX_AGE_MIN":120}' --output-dir artifacts/age-120
 ```
 
-No parent checkout, Bun installation or local worker build is required. The visible
-SQL launches the pinned native release with the literal location
-`github-auto://Query-farm/vgi-buoys@v0.1.0`. The tag resolves to
-`6d34f79eeb80d31bdb188666f60d116204625bb8`. Its release contains native macOS arm64,
-Linux x64/arm64 and Windows x64 assets; this notebook was executed on macOS arm64.
-First execution downloads the VGI extension and appropriate release asset.
+The visible ATTACH uses `github-auto://Query-farm/vgi-buoys@v0.1.0`, a native release with macOS arm64, Linux x64/arm64 and Windows x64 assets. Tag source is `6d34f79eeb80d31bdb188666f60d116204625bb8`. No Bun installation or source checkout is needed. GitHub release downloads and the community VGI extension require network access; anonymous API rate limits can affect an uncached download.
 
-The separate lock pins Haybarn **2.0.0rc11**, JupySQL and plotting dependencies.
-The runner creates a temporary kernel with its interpreter, runs with this
-directory as cwd and atomically replaces the saved notebook only after success.
-For a Jupyter frontend, optionally register the environment:
+### Source, clocks and units
+
+Both stories use unchanged official NOAA NDBC XML/text served over a strict loopback replay. SHA-256 verification happens before startup. The actual released worker parses the responses and emits typed rows. [Original recordings](recordings/manifest.json) preserve the earlier directory/Boston history capture; [latest-file recordings](latest-recordings/manifest.json) preserve a separately acquired directory/network file. Original files are not overwritten. Independent requests do not form an atomic snapshot; the two notebooks' captures must not be joined as though acquired simultaneously.
+
+The wave story retains its half-open 48-hour UTC window, ending at the original capture hour. The worker's inclusive source bounds are followed by an explicit local end-exclusive filter. Missing MM values stay NULL, measured zero stays zero, and no absent timestamp is fabricated. Significant wave height is an average of the highest third of waves in a sampling period, not the largest individual wave. Source units and conversion scales come from the worker's measurement reference. The thresholds are analytical choices, not navigation or weather-safety boundaries. See [NOAA measurement definitions](https://www.ndbc.noaa.gov/measdes.shtml).
+
+The latest-report story holds its acquisition clock fixed across reruns and classifies every returned report. Observation timestamps determine age; fetched_at is replay time, and source_url is loopback. Directory absence, capability flags, timestamp eligibility and missing measurements remain distinct. A larger age limit cannot add observations or change their measured values.
+
+### Optional live mode
+
+The first notebook also supports explicit `DATA_MODE="live"`. It removes an inherited endpoint override and requests official NOAA directly, using the 48 hours before the current UTC minute. There is no fallback or automatic window shift; empty windows or no usable waves stop clearly. This moving window is separate from the controlled threshold experiment.
 
 ```sh
-uv run --locked python -m ipykernel install --user \
-  --name vgi-buoys-notebooks --display-name "Python (vgi-buoys notebooks)"
+uv run --locked vgi-notebooks 01_measure_wave_exceedance.ipynb --parameters '{"DATA_MODE":"live"}' --output-dir artifacts/live --timeout 300
 ```
 
-Restart and run all after parameter edits. The runner itself registers no global
-kernel. Overrides require a separate output directory and copy the guide, assets,
-recordings and helpers beside the result. Logs and experiments are ignored.
+### Evidence and limits
 
-## Source and clocks
+[Coverage evidence](coverage.json) retains the complete released catalog and reviewed current source separately: four logical surfaces, including the stations function/table alias. All four have visible SQL, meaningful outputs and interpretations. Current source adds composed examples/tasks only; analytical runtime evidence is from the public release. Existing green source CI is reused for notebook-only changes. Defaults, detached experiments, setup with preloaded libraries, guards, charts and actual GitHub SVG rendering are checked. Local compatibility testing is distinct from manually running hosted Colab.
 
-Default `DATA_MODE = "recorded"` serves unchanged official NOAA NDBC responses
-captured **14 November 2026 UTC** over the worker's supported `BUOYS_BASE_URL`.
-The server checks each SHA-256 and serves only the two documented paths; it does
-not parse observations or calculate results. The actual published worker parses
-NOAA XML/text, handles missing values and emits Arrow. These are source recordings,
-not synthetic measurements. See [the manifest](recordings/manifest.json) for exact
-URLs, UTC capture times, content types and hashes. No account or API key is used.
-
-The recorded window is **2026-11-12 06:00 UTC inclusive to 2026-11-14 06:00 UTC
-exclusive**. The end is the capture hour rounded down, not the newest returned
-observation. The worker's time arguments are inclusive; a visible local SQL filter
-establishes the half-open analysis window. A station history request downloads the
-recent file (usually about 45 days) and filters it; it cannot retrieve archives.
-
-The worker sets `fetched_at` when it parses each response. In recorded mode this is
-the replay time, and `source_url` is the loopback URL. The manifest separately
-records original official URLs and capture times. Independent directory/history
-responses are not an atomic snapshot. The station location is directory metadata.
-
-```sh
-uv run --locked python execute.py --timeout 300 \
-  --parameters '{"DATA_MODE": "live"}' --output-dir artifacts/live
-```
-
-Live mode removes inherited `BUOYS_BASE_URL`, requests official NOAA, and uses the
-48 hours before the current UTC minute. It never falls back to recordings or moves
-the window to fit stale data. Empty windows and windows with no usable waves stop
-clearly. Missing rows, unmeasured fields and source freshness appear separately.
-
-## Focused experiment
-
-```sh
-uv run --locked python execute.py --timeout 300 \
-  --parameters '{"WAVE_THRESHOLD_M": 3.0}' --output-dir artifacts/threshold-3m
-```
-
-Change only **WAVE_THRESHOLD_M**, from **2.0 to 3.0 metres**. Predict that exceedance
-counts cannot increase while the measured and all-row denominators stay fixed.
-Compare both proportion labels and the time plot. Reset to **2.0**. Thresholds
-must be finite, greater than zero and at most 20 metres. Both modes fix station
-44013 and the 48-hour duration; a different station or recording is a new example.
-
-## Meaning and limits
-
-`wave_height_m` is significant wave height: the average of the highest one-third
-of waves in the sampling period, not the largest individual wave. Missing `MM`
-becomes NULL; measured zero remains zero. The threshold is an analytical choice,
-not a safety boundary. See NOAA's [measurement definitions](https://www.ndbc.noaa.gov/measdes.shtml)
-and [station page](https://www.ndbc.noaa.gov/station_page.php?station=44013).
-
-The measured-wave fraction divides threshold exceedances by rows with a measured
-wave height. The all-row fraction divides the same count by all returned weather
-rows, including those with no wave measurement. Neither is a time-weighted storm
-probability or a fraction of the 48-hour duration. Reporting cadence, missingness,
-source quality and the chosen station/window constrain interpretation. No absent
-rows are fabricated; no values are interpolated. Gaps between returned timestamps
-are diagnostics, not proof of instrument failure.
-
-Source data: NOAA National Data Buoy Center, including observations identified by
-NOAA as station 44013. Attribution does not imply NOAA endorsement. The worker
-license and notebook branding remain separate from source data attribution.
-
-## Validation and upgrades
-
-The repository's `make check` passes Biome, strict TypeScript, 13 Bun tests/57
-expectations, 94 stdio/94 launch/57 HTTP SQL assertions, and metadata 100/100 L2
-with zero errors/warnings and one existing VGI808 informational finding about the
-station key. Stock DuckDB checks pass 12 result/6 expected-error cases; three live
-NOAA checks pass. Notebook validation additionally executes default, detached
-experiment and live mode, inspects figures, checks SQL identities and runner guards.
-
-To upgrade, change the literal release pin and rerun default, experiment and live
-mode before replacing outputs. The community VGI extension is installed separately
-from the Python lock. New recordings require explicit provenance and checksums.
+Rows count returned station reports or weather observations. Fractions are not time-weighted storm probabilities, ocean-area coverage or forecasts; reporting patterns and missingness may be systematic. Source: NOAA National Data Buoy Center. Attribution does not imply endorsement. Worker and branding licensing remain separate from public-source attribution.

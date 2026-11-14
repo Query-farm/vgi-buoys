@@ -1,0 +1,78 @@
+{
+  "query": "SELECT * FROM duckdb_tables() WHERE database_name='buoys' ORDER BY schema_name,table_name",
+  "columns": [
+    "database_name",
+    "database_oid",
+    "schema_name",
+    "schema_oid",
+    "table_name",
+    "table_oid",
+    "comment",
+    "tags",
+    "internal",
+    "temporary",
+    "has_primary_key",
+    "estimated_size",
+    "column_count",
+    "index_count",
+    "check_constraint_count",
+    "sql"
+  ],
+  "rows": [
+    [
+      "buoys",
+      22592,
+      "main",
+      22593,
+      "measurements",
+      22730,
+      "NDBC measurement fields, source units and conversion factors",
+      {
+        "domain": "marine",
+        "vgi.category": "api",
+        "vgi.doc_llm": "A built-in reference for all supported NDBC meteorological measurements. Use column_name to connect a result column to its source_field, source_unit, output_unit and conversion scale. This deterministic table makes no network requests. Missing source measurements stay NULL before conversion. Wind and wave directions retain their source convention: where they come from, relative to true north.",
+        "vgi.doc_md": "## Measurements Reference\n\nA built-in reference for all supported NDBC meteorological measurements. Use column_name to connect a result column to its source_field, source_unit, output_unit and conversion scale. This deterministic table makes no network requests. Missing source measurements stay NULL before conversion. Wind and wave directions retain their source convention: where they come from, relative to true north.\n\n### Result columns\n\n| Column | Meaning |\n| --- | --- |\n| column_name | Output measurement column. |\n| source_field | NDBC text header field. |\n| source_unit | Unit in the source NDBC data file. |\n| output_unit | Unit in the worker result. |\n| scale | Dimensionless conversion factor: multiply source values by this ratio to obtain output values. |",
+        "vgi.example_queries": "[{\"sql\":\"SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'\",\"description\":\"NDBC measurement fields, source units and conversion factors\"}]",
+        "vgi.executable_examples": "[{\"sql\":\"SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'\",\"description\":\"NDBC measurement fields, source units and conversion factors\",\"expected_result\":[[\"visibility_m\",\"nmi\",\"m\",1852]]}]",
+        "vgi.keywords": "[\"reference\",\"noaa\",\"units\",\"buoys\"]",
+        "vgi.result_columns_schema": "[{\"name\":\"column_name\",\"type\":\"VARCHAR\",\"description\":\"Output measurement column.\"},{\"name\":\"source_field\",\"type\":\"VARCHAR\",\"description\":\"NDBC text header field.\"},{\"name\":\"source_unit\",\"type\":\"VARCHAR\",\"description\":\"Unit in the source NDBC data file.\"},{\"name\":\"output_unit\",\"type\":\"VARCHAR\",\"description\":\"Unit in the worker result.\"},{\"name\":\"scale\",\"type\":\"DOUBLE\",\"description\":\"Dimensionless conversion factor: multiply source values by this ratio to obtain output values.\"}]",
+        "vgi.title": "Measurements Reference"
+      },
+      false,
+      false,
+      true,
+      0,
+      5,
+      1,
+      0,
+      "CREATE TABLE measurements(column_name VARCHAR, source_field VARCHAR NOT NULL, source_unit VARCHAR NOT NULL, output_unit VARCHAR NOT NULL, scale DOUBLE NOT NULL, PRIMARY KEY(column_name));"
+    ],
+    [
+      "buoys",
+      22592,
+      "main",
+      22593,
+      "stations",
+      22731,
+      "Active NDBC station directory with locations, owners and instrument capability flags",
+      {
+        "domain": "marine",
+        "vgi.category": "api",
+        "vgi.doc_llm": "Read the NDBC active-station XML catalog, including partner and land stations. No arguments or API key. Returns station_id, name, coordinates, elevation_m, owner, program, station_type and capability booleans, plus source_url and fetched_at. IDs are lowercase strings. Missing attributes are NULL. Active station metadata does not guarantee fresh measurements or a standard meteorological file. Filter for has_met and join station_id with observations() or latest_observations(). Coordinates here describe the catalog location, not a moving buoy's observation position.",
+        "vgi.doc_md": "## NDBC Active Stations\n\nRead the NDBC active-station XML catalog, including partner and land stations. No arguments or API key. Returns station_id, name, coordinates, elevation_m, owner, program, station_type and capability booleans, plus source_url and fetched_at. IDs are lowercase strings. Missing attributes are NULL. Active station metadata does not guarantee fresh measurements or a standard meteorological file. Filter for has_met and join station_id with observations() or latest_observations(). Coordinates here describe the catalog location, not a moving buoy's observation position.\n\n### Result columns\n\n| Column | Meaning |\n| --- | --- |\n| station_id | NDBC station identifier in lowercase. |\n| name | Station name. |\n| latitude | Station latitude in decimal degrees. |\n| longitude | Station longitude in decimal degrees. |\n| elevation_m | Site elevation in metres above mean sea level when supplied. |\n| owner | Organization responsible for the station. |\n| program | NDBC or partner program. |\n| station_type | NOAA station type, such as buoy, fixed or oilrig. |\n| has_met | Whether NDBC lists meteorological observations for this station. |\n| has_currents | Whether NDBC lists current observations; this worker reads standard meteorological data only. |\n| has_water_quality | Whether NDBC lists water-quality observations. |\n| has_dart | Whether this is a DART tsunami station. |\n| source_url | Exact NOAA NDBC source URL. |\n| fetched_at | UTC retrieval time; use time to assess measurement freshness. |",
+        "vgi.example_queries": "[{\"sql\":\"SELECT station_id, name FROM buoys.main.stations WHERE has_met ORDER BY station_id\",\"description\":\"Discover stations with meteorological data\"}]",
+        "vgi.keywords": "[\"buoy\",\"station\",\"ndbc\",\"noaa\",\"marine\",\"sensors\",\"location\"]",
+        "vgi.result_columns_schema": "[{\"name\":\"station_id\",\"type\":\"VARCHAR\",\"description\":\"NDBC station identifier in lowercase.\"},{\"name\":\"name\",\"type\":\"VARCHAR\",\"description\":\"Station name.\"},{\"name\":\"latitude\",\"type\":\"DOUBLE\",\"description\":\"Station latitude in decimal degrees.\"},{\"name\":\"longitude\",\"type\":\"DOUBLE\",\"description\":\"Station longitude in decimal degrees.\"},{\"name\":\"elevation_m\",\"type\":\"DOUBLE\",\"description\":\"Site elevation in metres above mean sea level when supplied.\"},{\"name\":\"owner\",\"type\":\"VARCHAR\",\"description\":\"Organization responsible for the station.\"},{\"name\":\"program\",\"type\":\"VARCHAR\",\"description\":\"NDBC or partner program.\"},{\"name\":\"station_type\",\"type\":\"VARCHAR\",\"description\":\"NOAA station type, such as buoy, fixed or oilrig.\"},{\"name\":\"has_met\",\"type\":\"BOOLEAN\",\"description\":\"Whether NDBC lists meteorological observations for this station.\"},{\"name\":\"has_currents\",\"type\":\"BOOLEAN\",\"description\":\"Whether NDBC lists current observations; this worker reads standard meteorological data only.\"},{\"name\":\"has_water_quality\",\"type\":\"BOOLEAN\",\"description\":\"Whether NDBC lists water-quality observations.\"},{\"name\":\"has_dart\",\"type\":\"BOOLEAN\",\"description\":\"Whether this is a DART tsunami station.\"},{\"name\":\"source_url\",\"type\":\"VARCHAR\",\"description\":\"Exact NOAA NDBC source URL.\"},{\"name\":\"fetched_at\",\"type\":\"TIMESTAMPTZ\",\"description\":\"UTC retrieval time; use time to assess measurement freshness.\"}]",
+        "vgi.title": "NDBC Active Stations"
+      },
+      false,
+      false,
+      true,
+      0,
+      14,
+      1,
+      0,
+      "CREATE TABLE stations(station_id VARCHAR, \"name\" VARCHAR, latitude DOUBLE, longitude DOUBLE, elevation_m DOUBLE, \"owner\" VARCHAR, \"program\" VARCHAR, station_type VARCHAR, has_met BOOLEAN, has_currents BOOLEAN, has_water_quality BOOLEAN, has_dart BOOLEAN, source_url VARCHAR, fetched_at TIMESTAMP WITH TIME ZONE, PRIMARY KEY(station_id));"
+    ]
+  ]
+}

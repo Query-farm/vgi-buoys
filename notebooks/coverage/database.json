@@ -1,0 +1,29 @@
+{
+  "query": "SELECT database_name,comment,tags FROM duckdb_databases() WHERE database_name='buoys'",
+  "columns": [
+    "database_name",
+    "comment",
+    "tags"
+  ],
+  "rows": [
+    [
+      "buoys",
+      "# NOAA Buoys\n\nNOAA NDBC buoy stations, latest observations and recent station histories in SQL. Table functions return typed Arrow columns with UTC timestamps, source URLs and retrieval times. No API key is needed. Missing measurements become NULL; invalid arguments and unexpected upstream responses fail explicitly. Data is retrieved when a query executes. Use SQL to filter, aggregate and join stations to measurements. Wind speeds are m/s, waves are metres, periods seconds, temperatures Celsius and pressure hPa. Visibility is converted to metres and water level to metres relative to MLLW. The recent station file covers approximately 45 days; this worker does not read annual archives. Observation timestamps, not retrieval times, determine freshness.\n\n## Data access\n\nUse the main schema to discover stations and retrieve observations. Each response preserves its source URL and UTC retrieval time. Missing sensor values remain NULL.",
+      {
+        "vgi.agent_test_tasks": "[{\"name\":\"reference_units\",\"prompt\":\"List column_name, source_unit, output_unit and scale for visibility_m in the measurements reference table.\"},{\"name\":\"stations_query\",\"prompt\":\"Using buoys.main.stations, list the first five station IDs and names ordered by station ID.\"},{\"name\":\"latest_observations_query\",\"prompt\":\"Using buoys.main.latest_observations, list the five stations with highest nonmissing wind_speed_mps, ordered by wind_speed_mps descending then station_id.\"},{\"name\":\"observations_query\",\"prompt\":\"Using buoys.main.observations, list the five most recent nonmissing wave heights for station 44013, showing time and wave_height_m.\"}]",
+        "vgi.author": "Query.Farm",
+        "vgi.copyright": "Copyright 2026 Query.Farm LLC",
+        "vgi.doc_llm": "NOAA NDBC buoy stations, latest observations and recent station histories in SQL. Table functions return typed Arrow columns with UTC timestamps, source URLs and retrieval times. No API key is needed. Missing measurements become NULL; invalid arguments and unexpected upstream responses fail explicitly. Data is retrieved when a query executes. Use SQL to filter, aggregate and join stations to measurements. Wind speeds are m/s, waves are metres, periods seconds, temperatures Celsius and pressure hPa. Visibility is converted to metres and water level to metres relative to MLLW. The recent station file covers approximately 45 days; this worker does not read annual archives. Observation timestamps, not retrieval times, determine freshness.",
+        "vgi.doc_md": "# NOAA Buoys\n\nNOAA NDBC buoy stations, latest observations and recent station histories in SQL. Table functions return typed Arrow columns with UTC timestamps, source URLs and retrieval times. No API key is needed. Missing measurements become NULL; invalid arguments and unexpected upstream responses fail explicitly. Data is retrieved when a query executes. Use SQL to filter, aggregate and join stations to measurements. Wind speeds are m/s, waves are metres, periods seconds, temperatures Celsius and pressure hPa. Visibility is converted to metres and water level to metres relative to MLLW. The recent station file covers approximately 45 days; this worker does not read annual archives. Observation timestamps, not retrieval times, determine freshness.\n\n## Data access\n\nUse the main schema to discover stations and retrieve observations. Each response preserves its source URL and UTC retrieval time. Missing sensor values remain NULL.",
+        "vgi.icon_url": "https://query.farm/media-kit/products/vgi/vgi-logo.png",
+        "vgi.keywords": "[\"noaa\", \"buoys\", \"marine\", \"sql\", \"observations\", \"stations\"]",
+        "vgi.license": "0BSD",
+        "vgi.source_url": "https://github.com/Query-farm/vgi-buoys",
+        "vgi.subtitle": "NOAA NDBC buoy stations, latest observations and recent station histories for marine analysis.",
+        "vgi.support_contact": "https://github.com/Query-farm/vgi-buoys/issues",
+        "vgi.support_policy_url": "https://github.com/Query-farm/vgi-buoys#support",
+        "vgi.title": "NOAA Buoys"
+      }
+    ]
+  ]
+}

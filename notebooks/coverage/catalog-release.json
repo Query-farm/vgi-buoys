@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "repository": "Query-farm/vgi-buoys",
+  "revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+  "captured_at": "2026-11-14T23:20:29.092187+00:00",
+  "default_schema": "main",
+  "scope": "all_public_functions_and_tables",
+  "complete": true,
+  "objects": [
+    {
+      "schema": "main",
+      "name": "latest_observations",
+      "kind": "function",
+      "signatures": [
+        "latest_observations(VARCHAR) -> None"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "observations",
+      "kind": "function",
+      "signatures": [
+        "observations(VARCHAR, VARCHAR, VARCHAR) -> None"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "stations",
+      "kind": "function",
+      "signatures": [
+        "stations() -> None"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "measurements",
+      "kind": "table",
+      "signatures": [
+        "TABLE"
+      ],
+      "authentication": "none",
+      "access": "read"
+    },
+    {
+      "schema": "main",
+      "name": "stations",
+      "kind": "table",
+      "signatures": [
+        "TABLE"
+      ],
+      "authentication": "none",
+      "access": "read"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "coverage/functions.json",
+      "sha256": "0b613992e00fdb6d6e2245d223ebc5e2e6bfe35bb66c29d190089d5182393afd",
+      "description": "Complete real released runtime functions export"
+    },
+    {
+      "path": "coverage/tables.json",
+      "sha256": "58a7a0c721c4f36aaf35acc1914b641186281daa28cd5e12be55b158ee7f4bf7",
+      "description": "Complete real released runtime tables export"
+    },
+    {
+      "path": "coverage/views.json",
+      "sha256": "48d3b365966da8f3ff36f24ff4abf7e2f6944131dd3afff00703a5aacfbaf40b",
+      "description": "Complete real released runtime views export"
+    }
+  ]
+}

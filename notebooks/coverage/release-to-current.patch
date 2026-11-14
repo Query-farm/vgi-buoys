@@ -1,0 +1,184 @@
+diff --git a/src/catalog.ts b/src/catalog.ts
+index 6b49611..e3fe932 100644
+--- a/src/catalog.ts
++++ b/src/catalog.ts
+@@ -2,16 +2,12 @@ import { referenceTable } from "./reference.ts";
+ /** Assemble NOAA readers and reference tables into the public catalog. */
+ 
+ import type { CatalogDescriptor, VgiFunction } from "@query-farm/vgi";
++import { type Example, LATEST_WITH_UNITS } from "./composed.ts";
+ import { CATALOG_DOC_MD, CATALOG_NAME, CATALOG_TAGS, SCHEMA_DOC_MD, SCHEMA_TAGS, SOURCE_URL } from "./meta.ts";
+ import { FUNCTIONS, stationsTable } from "./noaa.ts";
+ 
+ export { FUNCTIONS } from "./noaa.ts";
+ 
+-interface Example {
+-  description: string;
+-  sql: string;
+-}
+-
+ /**
+  * Publish each function's examples as `vgi.example_queries` (with descriptions).
+  *
+@@ -33,7 +29,8 @@ function stampExampleQueries(functions: VgiFunction[]): Example[] {
+   return [...byName.values()].flat();
+ }
+ 
+-const ALL_EXAMPLES = stampExampleQueries(FUNCTIONS);
++// The measurements table's scan is not in FUNCTIONS, so its composed example is added here.
++const ALL_EXAMPLES = [...stampExampleQueries(FUNCTIONS), LATEST_WITH_UNITS];
+ 
+ export const CATALOG: CatalogDescriptor = {
+   name: CATALOG_NAME,
+diff --git a/src/composed.ts b/src/composed.ts
+new file mode 100644
+index 0000000..7985eac
+--- /dev/null
++++ b/src/composed.ts
+@@ -0,0 +1,54 @@
++/**
++ * Example queries that combine two or more of this worker's objects.
++ *
++ * Each SQL is defined once here and referenced from the object that drives the
++ * query (so agents see it on that object) and from the schema-level list.
++ */
++
++export interface Example {
++  description: string;
++  sql: string;
++}
++
++/** latest_observations() joined to the station directory for names and owners. */
++export const LARGEST_SEAS_NAMED: Example = {
++  description:
++    "Name the 10 stations reporting the largest significant wave heights in the latest file, with owner, station type and dominant period",
++  sql:
++    "SELECT o.station_id, s.name, s.owner, s.station_type, o.time, o.wave_height_m, o.dominant_period_s " +
++    "FROM buoys.main.latest_observations() AS o JOIN buoys.main.stations AS s USING (station_id) " +
++    "WHERE o.wave_height_m IS NOT NULL ORDER BY o.wave_height_m DESC, o.station_id LIMIT 10",
++};
++
++/** Directory stations with a meteorological flag but no row in the latest file. */
++export const SILENT_MET_STATIONS: Example = {
++  description:
++    "List directory stations flagged has_met that have no row in the latest observations file, with owner and station type",
++  sql:
++    "SELECT s.station_id, s.name, s.owner, s.station_type " +
++    "FROM buoys.main.stations AS s ANTI JOIN buoys.main.latest_observations() AS o USING (station_id) " +
++    "WHERE s.has_met ORDER BY s.station_id",
++};
++
++/** observations() rolled up per day, with the station directory's name and coordinates. */
++export const DAILY_HISTORY_WITH_STATION: Example = {
++  description:
++    "Summarise the 7 most recent days (session time zone) at buoy 44013 (daily peak wave height, mean wind speed, report count) with the directory name and coordinates that recent files omit",
++  sql:
++    "SELECT s.station_id, s.name, s.latitude, s.longitude, date_trunc('day', o.time) AS obs_day, " +
++    "max(o.wave_height_m) AS max_wave_height_m, avg(o.wind_speed_mps) AS mean_wind_speed_mps, count(*) AS reports " +
++    "FROM buoys.main.observations('44013') AS o JOIN buoys.main.stations AS s USING (station_id) " +
++    "GROUP BY ALL ORDER BY obs_day DESC LIMIT 7",
++};
++
++/** One station's latest reading, unpivoted to one row per reported measurement, with units. */
++export const LATEST_WITH_UNITS: Example = {
++  description:
++    "Show each non-missing measurement in station 46026's latest report as one row, with its output unit, NDBC source field, source unit and conversion scale",
++  sql:
++    "SELECT v.column_name, v.value, m.output_unit, m.source_field, m.source_unit, m.scale " +
++    "FROM (UNPIVOT buoys.main.latest_observations(station_id := '46026') " +
++    "ON COLUMNS(* EXCLUDE (station_id, time, latitude, longitude, source_url, fetched_at)) " +
++    "INTO NAME column_name VALUE value) AS v JOIN buoys.main.measurements AS m USING (column_name) " +
++    "ORDER BY v.column_name",
++};
+diff --git a/src/meta.ts b/src/meta.ts
+index de379bc..d7f85ab 100644
+--- a/src/meta.ts
++++ b/src/meta.ts
+@@ -90,6 +90,18 @@ export const AGENT_TEST_TASKS = [
+     prompt:
+       "Using buoys.main.observations, list the five most recent nonmissing wave heights for station 44013, showing time and wave_height_m.",
+   },
++  {
++    name: "composed_boston_peak_wave",
++    prompt:
++      "What is the highest significant wave height in buoy 44013's whole recent history (buoys.main.observations), and what is that station's name in the station directory? " +
++      "Save the answer with CREATE TEMP TABLE boston_peak AS SELECT ... with exactly one row and columns name (VARCHAR) and max_wave_height_m (DOUBLE).",
++  },
++  {
++    name: "composed_max_visibility_nmi",
++    prompt:
++      "What is the greatest visibility currently reported in buoys.main.latest_observations, expressed back in the NDBC source unit? Use the measurements reference table's scale for visibility_m to convert. " +
++      "Save the answer with CREATE TEMP TABLE max_visibility AS SELECT ... with exactly one row and one column visibility_nmi (DOUBLE).",
++  },
+ ];
+ export const CATALOG_TAGS: Record<string, string> = {
+   ...{
+diff --git a/src/noaa.ts b/src/noaa.ts
+index b556cf0..ecb6eb6 100644
+--- a/src/noaa.ts
++++ b/src/noaa.ts
+@@ -1,5 +1,6 @@
+ import { constraintRecord, type TableDescriptor, utf8, type VgiFunction } from "@query-farm/vgi";
+ import { XMLParser, XMLValidator } from "fast-xml-parser";
++import { DAILY_HISTORY_WITH_STATION, LARGEST_SEAS_NAMED, SILENT_MET_STATIONS } from "./composed.ts";
+ import { endpoint, getText } from "./http.ts";
+ import {
+   type Column,
+@@ -248,6 +249,7 @@ const stations = oneShot<Record<string, never>>({
+       sql: "SELECT station_id, name, latitude, longitude FROM buoys.main.stations() WHERE has_met ORDER BY station_id LIMIT 20",
+       description: "Discover stations with meteorological data",
+     },
++    SILENT_MET_STATIONS,
+   ],
+ });
+ 
+@@ -282,6 +284,7 @@ const latest = oneShot<{ station_id: string }>({
+       sql: "SELECT station_id, time, wave_height_m, dominant_period_s FROM buoys.main.latest_observations() WHERE wave_height_m IS NOT NULL ORDER BY wave_height_m DESC, station_id LIMIT 10",
+       description: "Find the largest reported seas and their wave periods",
+     },
++    LARGEST_SEAS_NAMED,
+   ],
+ });
+ 
+@@ -343,6 +346,7 @@ const observations = oneShot<{ station_id: string; start_time: string; end_time:
+       sql: "SELECT time, wind_speed_mps, wave_height_m, dominant_period_s FROM buoys.main.observations('44013') WHERE wave_height_m IS NOT NULL ORDER BY time DESC LIMIT 24",
+       description: "Inspect the latest measured waves and winds off Boston",
+     },
++    DAILY_HISTORY_WITH_STATION,
+   ],
+ });
+ 
+@@ -383,6 +387,7 @@ export const stationsTable: TableDescriptor = {
+         sql: "SELECT station_id, name FROM buoys.main.stations WHERE has_met ORDER BY station_id",
+         description: "Discover stations with meteorological data",
+       },
++      SILENT_MET_STATIONS,
+     ]),
+   },
+ };
+diff --git a/src/reference.ts b/src/reference.ts
+index a57acaa..66033c3 100644
+--- a/src/reference.ts
++++ b/src/reference.ts
+@@ -1,4 +1,5 @@
+ import { constraintRecord, type TableDescriptor } from "@query-farm/vgi";
++import { LATEST_WITH_UNITS } from "./composed.ts";
+ import { MEASURES } from "./noaa.ts";
+ import { type Column, oneShot, outputSchema } from "./table.ts";
+ 
+@@ -36,6 +37,7 @@ const scan = oneShot<Record<string, never>>({
+       sql: "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'",
+       description: "NDBC measurement fields, source units and conversion factors",
+     },
++    LATEST_WITH_UNITS,
+   ],
+ });
+ export const referenceTable: TableDescriptor = {
+@@ -81,6 +83,7 @@ export const referenceTable: TableDescriptor = {
+         sql: "SELECT column_name, source_unit, output_unit, scale FROM buoys.main.measurements WHERE column_name = 'visibility_m'",
+         description: "NDBC measurement fields, source units and conversion factors",
+       },
++      LATEST_WITH_UNITS,
+     ]),
+   },
+ };

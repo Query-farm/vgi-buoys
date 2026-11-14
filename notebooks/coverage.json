@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "catalogs": {
+    "released": {
+      "path": "coverage/catalog-release.json",
+      "sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T23:29:51.520807+00:00",
+        "catalog_sha256": "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+        "notes": "Complete three-function/two-table catalog has four logical names because stations aliases the relation. No views, COPY or excluded authenticated APIs. Current source adds composed examples and tasks only; analytical receipt remains exact release revision."
+      }
+    },
+    "current": {
+      "path": "coverage/catalog-current.json",
+      "sha256": "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20",
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T23:29:51.520807+00:00",
+        "catalog_sha256": "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20",
+        "notes": "Complete three-function/two-table catalog has four logical names because stations aliases the relation. No views, COPY or excluded authenticated APIs. Current source adds composed examples and tasks only; analytical receipt remains exact release revision."
+      }
+    }
+  },
+  "notebooks": [
+    {
+      "path": "01_measure_wave_exceedance.ipynb",
+      "sha256": "5ec6e4e44537810070d440a76b4627794e56d26729ada769f700a0c03846ad1b",
+      "execution": {
+        "path": "coverage/run-01.json",
+        "sha256": "0efa6caea1edef4fac1d7f7b2b810694b6f25bef047ad2785b35e05a75719397"
+      }
+    },
+    {
+      "path": "02_latest_is_not_a_fresh_wave_measurement.ipynb",
+      "sha256": "e2662a52916c2fed77d681eabea940119300b425ff5cabc5a1fff8978d01ed47",
+      "execution": {
+        "path": "coverage/run-02.json",
+        "sha256": "8141634c99cd8f3e5760c79b4ae209c2412e614e5f79ecc04f971a379bf07e70"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "object": {
+        "schema": "main",
+        "name": "measurements"
+      },
+      "notebook": "01_measure_wave_exceedance.ipynb",
+      "sql": [
+        {
+          "cell": "47783cb9",
+          "reference": "buoys.main.measurements"
+        }
+      ],
+      "narrative_cells": [
+        "91e796d2"
+      ],
+      "result_cells": [
+        "47783cb9",
+        "32562ad2"
+      ],
+      "interpretation_cells": [
+        "91e796d2",
+        "32562ad2"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T23:29:51.520807+00:00",
+        "notebook_sha256": "5ec6e4e44537810070d440a76b4627794e56d26729ada769f700a0c03846ad1b",
+        "catalog_sha256": [
+          "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+          "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20"
+        ],
+        "purpose": "Verify source/output units before comparing wave heights against a threshold.",
+        "finding": "The local reference shows wave height in metres with scale1; visibility and water level have distinct source conversions. SQL checks verify the wave unit rather than guessing it. Missing source measurements stayNULL; zeros remain measured."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "stations"
+      },
+      "notebook": "01_measure_wave_exceedance.ipynb",
+      "sql": [
+        {
+          "cell": "06f8e123",
+          "reference": "buoys.main.stations"
+        }
+      ],
+      "narrative_cells": [
+        "1f65d040"
+      ],
+      "result_cells": [
+        "06f8e123",
+        "32562ad2"
+      ],
+      "interpretation_cells": [
+        "2bdc7556",
+        "32562ad2"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T23:29:51.520807+00:00",
+        "notebook_sha256": "5ec6e4e44537810070d440a76b4627794e56d26729ada769f700a0c03846ad1b",
+        "catalog_sha256": [
+          "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+          "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20"
+        ],
+        "purpose": "Identify Boston44013 and preserve directory location/ownership separately from observation timestamps.",
+        "finding": "Exactly one directory record identifies the selected station and its has_met flag. The recorded directory and history are independently acquired; no atomic snapshot or instrument health claim follows."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "observations"
+      },
+      "notebook": "01_measure_wave_exceedance.ipynb",
+      "sql": [
+        {
+          "cell": "06f8e123",
+          "reference": "buoys.main.observations"
+        }
+      ],
+      "narrative_cells": [
+        "1f65d040",
+        "9ed111a8",
+        "5a66501b"
+      ],
+      "result_cells": [
+        "2bdc7556",
+        "553899c4",
+        "0c0d159c",
+        "ef271de9",
+        "32562ad2"
+      ],
+      "interpretation_cells": [
+        "553899c4",
+        "0e1ae47f"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T23:29:51.520807+00:00",
+        "notebook_sha256": "5ec6e4e44537810070d440a76b4627794e56d26729ada769f700a0c03846ad1b",
+        "catalog_sha256": [
+          "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+          "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20"
+        ],
+        "purpose": "Compare measured-wave and all-weather-row exceedance fractions under a fixed half-open48hour window.",
+        "finding": "The unchanged official recording contains281rows,135measuredwaves and146missingwaves;53meet2m. Increasing thresholdto3m changes numerator only; sourcewavevalues,denominatorsandmissingnessfixed. Fractionscountreturnedrows,notdurationorstormprobability."
+      }
+    },
+    {
+      "object": {
+        "schema": "main",
+        "name": "latest_observations"
+      },
+      "notebook": "02_latest_is_not_a_fresh_wave_measurement.ipynb",
+      "sql": [
+        {
+          "cell": "inputs",
+          "reference": "buoys.main.latest_observations"
+        }
+      ],
+      "narrative_cells": [
+        "input-story",
+        "class-story"
+      ],
+      "result_cells": [
+        "quality-result",
+        "category-result",
+        "sample-result",
+        "checks-result"
+      ],
+      "interpretation_cells": [
+        "category-result",
+        "sample-result",
+        "experiment"
+      ],
+      "review": {
+        "status": "approved",
+        "reviewer": "Codex /root",
+        "reviewed_at": "2026-11-14T23:29:51.520807+00:00",
+        "notebook_sha256": "e2662a52916c2fed77d681eabea940119300b425ff5cabc5a1fff8978d01ed47",
+        "catalog_sha256": [
+          "e42bdc0cfddd8ce828b996b67f5ebba5a6226b4cf99e2c375328d0b2bc9817bf",
+          "7f879c97bdfb0796ccd34a65264ba5e7a1ce8b4f30d27c274444f7c1bfe40a20"
+        ],
+        "purpose": "Separate latest-file membership, observation age and usable wave measurements at a fixed acquisition clock.",
+        "finding": "834recordedreports partitioninto70measuredand109missingwavewithin30minutes,655outsideage,and0future/missingtimestamps. The120minuteexperiment changes onlyeligibility; alloriginalvalues,timestamps,filesandreferenceclockremainfixed. Missingwaveisnotzero; directoryabsenceisretained."
+      }
+    }
+  ]
+}

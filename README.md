@@ -1,5 +1,7 @@
 # vgi-buoys
 
+[Executed SQL notebooks](notebooks/README.md): wave-measurement denominators and latest-report freshness, with SVG charts and Open in Colab links.
+
 Read NOAA NDBC buoy and coastal-station observations from SQL. **TypeScript / Bun**, using VGI and Arrow batches. No API key required.
 
 Discover stations, inspect the latest network observations, and query recent station histories. The `measurements` reference table documents source fields, units and conversions. Fixed, moored and drifting standard-meteorological layouts are supported.

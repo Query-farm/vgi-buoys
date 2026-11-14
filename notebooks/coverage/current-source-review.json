@@ -1,0 +1,20 @@
+{
+  "current_revision": "3d6abf92b1e75f3e9efc1639c5f203a845526590",
+  "release_revision": "6d34f79eeb80d31bdb188666f60d116204625bb8",
+  "source_sha256": {
+    "src/catalog.ts": "e5d6bb7f01c1fda5047fd599419996ce48f072c981ae38a33ead569a9841b81e",
+    "src/cli.ts": "7e8d6368c2921331ff133340386060553009e2a33edac58012f2387b13059bfb",
+    "src/composed.ts": "76031d2fc1ec5cc421ce22f181ed3b45bd5938088aba9a64a26756c48e2c260d",
+    "src/http.ts": "3d7b13c9039913b8afa36bf0cf2b9efdfc1db136f34dc62d54cb9e7c88e0f426",
+    "src/log.ts": "fb0ed30f59611765946129c041bcae51f1e6fb97ff83ba0bbe773601346726dc",
+    "src/meta.ts": "8a7aac496403e970e000c29376dcc08ba6dc6d7b2b3e3944940bcb3495d4aa58",
+    "src/noaa.ts": "62522fb19958ee42afed5e15c6b519475833b9fc80b67483affd2ff40d452368",
+    "src/reference.ts": "296339a9d2fa539765de4733f7e231c35d8eec3f075aaceeeff1a6e290fab4ea",
+    "src/table.ts": "150304666805c218e4f8c5006e490f1d7bc92663a627955557d9e4421914ca27",
+    "src/worker.ts": "e46585260c1e8b9ad2d760f8ad5dade7a1021275c109d4f596d51d47f00bd4a9"
+  },
+  "full_public_registration": "catalog.ts has one main schema with FUNCTIONS=[stations,latest_observations,observations], relations=[measurements,stations]. Same-named stations function/table is one logical surface. No other schemas, views, COPY or authenticated surfaces. Four logical names, five access forms.",
+  "source_diff_review": "Only composed SQL example metadata, example type import and agent tasks added. Signatures, output schemas, access forms, parser, request logic, registration and dependencies are unchanged. Current interface review is compatible evidence, not exact-current runtime execution.",
+  "reviewer": "Codex /root",
+  "reviewed_at": "2026-11-14T23:25:01.364691+00:00"
+}
