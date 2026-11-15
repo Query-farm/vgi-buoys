@@ -13,7 +13,7 @@
 import { field, type VgiDataType, type VgiField } from "@query-farm/vgi";
 
 export const CATALOG_NAME = "buoys";
-export const VERSION = "0.1.0";
+export const VERSION = "0.1.1";
 
 export const SOURCE_URL = "https://github.com/Query-farm/vgi-buoys";
 
@@ -58,6 +58,10 @@ export function objectTags(opts: {
 export function column(name: string, type: VgiDataType, comment: string, nullable = true): VgiField {
   return field(name, type, nullable, new Map([["comment", comment]]));
 }
+
+/** One plain-text sentence: the catalog COMMENT directories show as the worker"s description. */
+export const CATALOG_COMMENT =
+  "NOAA National Data Buoy Center stations, latest marine observations and about 45 days of recent station history (wind, waves, pressure, temperatures, visibility, water level) as SQL tables in metric units. No API key needed.";
 
 export const CATALOG_DOC_LLM =
   "NOAA NDBC buoy stations, latest observations and recent station histories in SQL. Table functions return typed Arrow columns with UTC timestamps, source URLs and retrieval times. No API key is needed. Missing measurements become NULL; invalid arguments and unexpected upstream responses fail explicitly. Data is retrieved when a query executes. Use SQL to filter, aggregate and join stations to measurements. Wind speeds are m/s, waves are metres, periods seconds, temperatures Celsius and pressure hPa. Visibility is converted to metres and water level to metres relative to MLLW. The recent station file covers approximately 45 days; this worker does not read annual archives. Observation timestamps, not retrieval times, determine freshness.";

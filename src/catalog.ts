@@ -3,7 +3,7 @@ import { referenceTable } from "./reference.ts";
 
 import type { CatalogDescriptor, VgiFunction } from "@query-farm/vgi";
 import { type Example, LATEST_WITH_UNITS } from "./composed.ts";
-import { CATALOG_DOC_MD, CATALOG_NAME, CATALOG_TAGS, SCHEMA_DOC_MD, SCHEMA_TAGS, SOURCE_URL } from "./meta.ts";
+import { CATALOG_COMMENT, CATALOG_NAME, CATALOG_TAGS, SCHEMA_DOC_MD, SCHEMA_TAGS, SOURCE_URL } from "./meta.ts";
 import { FUNCTIONS, stationsTable } from "./noaa.ts";
 
 export { FUNCTIONS } from "./noaa.ts";
@@ -34,7 +34,7 @@ const ALL_EXAMPLES = [...stampExampleQueries(FUNCTIONS), LATEST_WITH_UNITS];
 
 export const CATALOG: CatalogDescriptor = {
   name: CATALOG_NAME,
-  comment: CATALOG_DOC_MD,
+  comment: CATALOG_COMMENT,
   sourceUrl: SOURCE_URL,
   tags: CATALOG_TAGS,
   schemas: [
