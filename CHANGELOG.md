@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Docs link to upstream sources: the catalog `vgi.doc_md` now links the NOAA National Data Buoy Center, its realtime data access notes and its measurement descriptions (VGI183).
+- The `main` schema comment is now a short plain-text line instead of repeating the schema `vgi.doc_md` (VGI102).
+
 ## 0.1.1 (unreleased)
 
 - The catalog comment is now one plain-text sentence (under 300 characters) describing the worker's data, instead of the Markdown overview. The full overview remains in the catalog's `vgi.doc_md` and `vgi.doc_llm` tags.

@@ -13,7 +13,7 @@
 import { field, type VgiDataType, type VgiField } from "@query-farm/vgi";
 
 export const CATALOG_NAME = "buoys";
-export const VERSION = "0.1.1";
+export const VERSION = "0.1.2";
 
 export const SOURCE_URL = "https://github.com/Query-farm/vgi-buoys";
 
@@ -68,7 +68,13 @@ export const CATALOG_DOC_LLM =
 export const CATALOG_DOC_MD =
   "# NOAA Buoys\n\n" +
   CATALOG_DOC_LLM +
-  "\n\n## Data access\n\nUse the main schema to discover stations and retrieve observations. Each response preserves its source URL and UTC retrieval time. Missing sensor values remain NULL.";
+  "\n\n## Data access\n\nUse the main schema to discover stations and retrieve observations. Each response preserves its source URL and UTC retrieval time. Missing sensor values remain NULL.\n\n## Sources and references\n\n" +
+  "- [NOAA National Data Buoy Center](https://www.ndbc.noaa.gov/): the upstream station directory, latest-observation file and realtime station files this worker reads.\n" +
+  "- [NDBC realtime data access](https://www.ndbc.noaa.gov/faq/rt_data_access.shtml): how the realtime2 station files are published.\n" +
+  "- [NDBC measurement descriptions and units](https://www.ndbc.noaa.gov/faq/measdes.shtml): definitions of the source columns converted here.";
+/** Short plain-text schema COMMENT; SCHEMA_DOC_MD carries the longer narrative. */
+export const SCHEMA_COMMENT =
+  "NOAA NDBC buoy station directory, latest observations, recent station histories and a measurement unit reference.";
 export const SCHEMA_DOC_LLM = `The main schema exposes buoys station discovery, measurements and reference information. ${CATALOG_DOC_LLM}`;
 export const SCHEMA_DOC_MD =
   "## Marine functions\n\n" +

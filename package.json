@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "description": "NOAA NDBC buoy stations, latest observations and recent station histories in SQL.",
