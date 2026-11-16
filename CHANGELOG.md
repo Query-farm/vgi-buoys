@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 (2026-11-16)
+
+- Bump @query-farm/vgi to 0.50.1.
+
 ## 0.1.2
 
 - Docs link to upstream sources: the catalog `vgi.doc_md` now links the NOAA National Data Buoy Center, its realtime data access notes and its measurement descriptions (VGI183).
