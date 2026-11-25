@@ -17,9 +17,9 @@ Verified locally on November 13, 2026, macOS ARM64.
 | --- | --- |
 | `make check`: Biome + strict TypeScript | Passed |
 | Unit/parser/HTTP/worker tests | 13 passed, zero failures |
-| Haybarn 2.0.0rc11, stdio | 94 assertions passed, including starter recipes |
-| Haybarn 2.0.0rc11, Unix-socket launch | 94 assertions passed, including starter recipes |
-| Haybarn 2.0.0rc11, HTTP | 57 assertions passed |
+| Haybarn 2.0.1rc3, stdio | 94 assertions passed, including starter recipes |
+| Haybarn 2.0.1rc3, Unix-socket launch | 94 assertions passed, including starter recipes |
+| Haybarn 2.0.1rc3, HTTP | 57 assertions passed |
 | Metadata | 100/100, L2 behavioral, zero errors or warnings |
 | `make verify-stock`: stock DuckDB 2.0.0 | 12 result checks and 6 expected-error checks passed |
 | Skill's bundled stock-DuckDB verifier | 12 checks passed |

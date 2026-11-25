@@ -1,5 +1,5 @@
 {
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "NOAA NDBC buoy stations, latest observations and recent station histories in SQL.",
@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@query-farm/apache-arrow": "^21.1.1",
-    "@query-farm/vgi": "~0.50.1",
-    "@query-farm/vgi-rpc": "^0.29.7",
+    "@query-farm/vgi": "~0.52.2",
+    "@query-farm/vgi-rpc": "^0.30.2",
     "fast-xml-parser": "^5"
   },
   "devDependencies": {
